@@ -60,7 +60,7 @@ function captureFrame() {
   let context = canvas.getContext('2d');
   context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
   console.log(canvas.toDataURL('image/png'));
-  xhr.open('POST', '192.168.1.111', true);
+  xhr.open('POST', '192.168.0.100', true);
   xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
   xhr.send(`img=${canvas.toDataURL('image/png')}`);
 };    
