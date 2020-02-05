@@ -9,6 +9,8 @@ const path = require('path');
 
 app.use(bodyParser.urlencoded({extended: true, limit: '8mb'}));
 
+app.get('/', (req, res) => {return res.sendfile('default.html');});
+
 app.post('/', (req, res) => {
   let imgPath = path.resolve(__dirname, 'frames',  Math.random().toString(36).substring(2) + Date.now().toString(36));
   const img = req.body.img.replace('data:image/png;base64,', '');
