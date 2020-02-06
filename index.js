@@ -24,8 +24,7 @@ app.post('/', (req, res) => {
   let img = req.body.img.replace('data:image/png;base64,', '');
   img = img.replace(/ /g, '');
   img = img.replace(/\n/g, '');
-  //fs.writeFile(imgPath, img, {encoding: 'base64'}, e => {
-	fs.writeFile(imgPath, img, e => {
+  fs.writeFile(imgPath, img, {encoding: 'base64'}, e => {
     if (e) {throw new Error(e)};
     const idProcess = child_process.spawn('alpr', ['-c us', imgPath]);
     idProcess.stdout.on('data', data => {
@@ -38,13 +37,22 @@ app.post('/', (req, res) => {
   });
 });
 
-const sslOptions = {
-  key: fs.readFileSync(__dirname + '/ssl/selfsigned.key'),
-  cert: fs.readFileSync(__dirname + '/ssl/selfsigned.crt')
-};
+if (process.env.DEV === 'true') {
 
-const httpsApp = https.createServer(sslOptions, app);
+  app.listen(8080, () => {
+    console.log('ALPR test server listening on port 8080.');
+  });
 
-httpsApp.listen(8443, () => {
-  console.log('ALPR server listening on port 8443.');
-});
+} else {
+  
+  const sslOptions = {
+    key: fs.readFileSync(__dirname + '/ssl/selfsigned.key'),
+    cert: fs.readFileSync(__dirname + '/ssl/selfsigned.crt')
+  };
+  
+  const httpsApp = https.createServer(sslOptions, app);
+  
+  httpsApp.listen(8443, () => {
+    console.log('ALPR server listening on port 8443.');
+  });
+}
