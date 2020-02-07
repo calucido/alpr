@@ -7,6 +7,7 @@ const path = require('path');
 const https = require('https');
 const child_process = require('child_process');
 const Fuse = require('fuse.js');
+const { send } = require('./lib/common');
 
 const app = express();
 
@@ -41,18 +42,24 @@ app.post('/', (req, res) => {
       data = JSON.parse(data.toString());
 	    console.log(data);
       if (data.results.length !== 0) {
-	      console.log('have data')
         let resultPlate = data.results[0].plate
+console.log('result plate' + resultPlate)
 	let matchedPlate = plateSearch.search(resultPlate)[0];
+console.log('matched plate' + matchedPlate)
 	if (matchedPlate) {
           matchedPlate = matchedPlate.prettyName;
         } else {
           matchedPlate = resultPlate;
         }
+console.log('final' + matchedPlate)
         if (activePlates.indexOf(matchedPlate === -1)) {
           // even if matched plate is in activePlates it will still run this code..............
           activePlates.push(matchedPlate);
-          console.log(`${matchedPlate} seen.`); // eventual telegram msg
+          console.log(`${matchedPlate} seen.`);
+          //send(process.env.CHAT_ID, `${matchedPlate} seen.`, (e) => {
+          //  if (e) { throw new Error(e); }
+          //  res.sendStatus(200);
+          //});
         }
       } else {
         activePlates = [];
@@ -63,7 +70,6 @@ app.post('/', (req, res) => {
         if (e) throw new Error(e);
       });
     });
-    res.sendStatus(200);
   });
 });
 
