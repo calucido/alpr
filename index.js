@@ -40,29 +40,36 @@ app.post('/', (req, res) => {
     const idProcess = child_process.spawn('alpr', ['-c us', '-j', '--config ' + path.resolve(__dirname, 'openalpr.conf'), imgPath]);
     idProcess.stdout.on('data', data => {
       data = JSON.parse(data.toString());
-	    console.log(data);
       if (data.results.length !== 0) {
+	let plateKnown;
         let resultPlate = data.results[0].plate
-console.log('result plate' + resultPlate)
 	let matchedPlate = plateSearch.search(resultPlate)[0];
-console.log('matched plate' + matchedPlate)
 	if (matchedPlate) {
           matchedPlate = matchedPlate.prettyName;
+          plateKnown = true;
         } else {
           matchedPlate = resultPlate;
+          plateKnown = false;
         }
-console.log('final' + matchedPlate)
-        if (activePlates.indexOf(matchedPlate === -1)) {
-          // even if matched plate is in activePlates it will still run this code..............
-          activePlates.push(matchedPlate);
+        if (activePlates.indexOf(matchedPlate) === -1) {
+          if (plateKnown) {
+            activePlates.push(matchedPlate);
+          } else {
+            for (let candidate of data.results[0].candidates) {
+              activePlates.push(candidate.plate);
+            }
+          }
           console.log(`${matchedPlate} seen.`);
-          //send(process.env.CHAT_ID, `${matchedPlate} seen.`, (e) => {
-          //  if (e) { throw new Error(e); }
-          //  res.sendStatus(200);
-          //});
+          send(process.env.CHAT_ID, `${matchedPlate} seen.`, (e) => {
+            if (e) { throw new Error(e); }
+            res.sendStatus(200);
+          });
+        } else {
+          res.sendStatus(200);
         }
       } else {
         activePlates = [];
+        res.sendStatus(200);
       }
     });
     idProcess.on('close', code => {

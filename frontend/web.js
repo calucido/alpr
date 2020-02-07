@@ -24,7 +24,7 @@ function gotDevices(mediaDevices) {
       select.appendChild(option);
     }
   });
-  setInterval(captureFrame, 10000);
+  setInterval(captureFrame, 1000);
 }
 
 button.addEventListener('click', event => {
