@@ -59,7 +59,7 @@ function captureFrame() {
   canvas.setAttribute('height', video.videoHeight);
   let context = canvas.getContext('2d');
   context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-  console.log(canvas.toDataURL('image/png'));
+//  console.log(canvas.toDataURL('image/png'));
 
   const xhr = new XMLHttpRequest();
   xhr.open('POST', '//192.168.0.100:8443', true);
